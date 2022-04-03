@@ -1,36 +1,53 @@
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Document</title>
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='style.css') }}"/>
+</head>
+
 
 <body>
-  <div class="container">
-    <div class="jumbotron">
-      <h1> LED WALL </h1>
-      <p> Controll your LED Wall via Webserver <p>
-    </div>
 
-    <br>
-      <h2> Start and Control Options</h2>
-      <hr style="width:100%;text-align:left;margin-left:0">
+ <h1 class="headings">LED WALL</h1>
+    <h2 class="headings">Start and Control Options</h2>
 
-      <button  onclick="location.href='/on'" class="btn btn-success" > Start </button>
-      <button onclick="location.href='/Shutdown'" class="btn btn-success" > Shutdown </button>
-      <button onclick="location.href='/LEDTest'" class="btn btn-success" > LEDTest </button>
-    <br>
-    <br>
-
-      <br>
-      <h3> Choose Gamemode</h3>
-      <hr style="width:100%;text-align:left;margin-left:0">
-
-      <button onclick= "location.href='/Gamemode1'" class="btn btn-success" > Gamemode1 </button>
-
-      <button onclick= "location.href='/Gamemode2'" class="btn btn-success" > Gamemode2 </button>
-
+    <button onclick="location.href='/on'">
+        <span class="shadow"></span>
+        <span class="edge"></span>
+        <span class="front text"> Start
+        </span>
+    </button>
+    <button onclick="location.href='/Shutdown'">
+        <span class="shadow"></span>
+        <span class="edge"></span>
+        <span class="front text"> Shutdown
+        </span>
+    </button >
+    <button onclick="location.href='/LEDTest'">
+        <span class="shadow"></span>
+        <span class="edge"></span>
+        <span class="front text"> LED Test
+        </span>
+    </button>
 
 
+    <h2 class="headings"> Choose Gamemode </h2>
+    <button onclick="location.href='/Gamemode1'">
+        <span class="shadow"></span>
+        <span class="edge"></span>
+        <span class="front text"> Gamemode 1
+        </span>
+    </button>
+    <button onclick="location.href='/Gamemode2'">
+        <span class="shadow"></span>
+        <span class="edge"></span>
+        <span class="front text"> Gamemode 2
+        </span>
+    </button>
 
-
-  </div>
 </body>
 

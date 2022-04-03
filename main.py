@@ -25,7 +25,29 @@ def Shutdown():
 
 @app.route("/LEDTest")
 def LEDTest():
-    print("LEDTest")
+    global run_flag
+    run_flag = True
+    while run_flag:
+        print("Wall is LED Mode !")
+
+    return render_template("index.html")
+
+@app.route("/Gamemode1")
+def Gamemode1():
+    global run_flag
+    run_flag = True
+    while run_flag:
+        print("Wall is Gamemode1 !")
+
+    return render_template("index.html")
+
+@app.route("/Gamemode2")
+def Gamemode2():
+    global run_flag
+    run_flag = True
+    while run_flag:
+        print("Wall is in Gamemode2 !")
+
     return render_template("index.html")
 
 
