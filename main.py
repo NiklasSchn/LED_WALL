@@ -1,9 +1,13 @@
 from flask import Flask, render_template, redirect, url_for, request
 import os
+
+import board
+import neopixel
+import numpy as np
+import time
+
 app = Flask(__name__)
-
-run_flag = False
-
+run_flag = False                        
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -12,8 +16,8 @@ def home():
 def on():
     global run_flag
     run_flag = True
-    while run_flag:
-        print("Wall is on !")
+    
+    
     return render_template("index.html")
 
 @app.route("/Shutdown")
