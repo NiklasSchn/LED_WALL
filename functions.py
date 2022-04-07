@@ -6,7 +6,7 @@ import numpy as np
 
 
 def text_to_rgb(text, fill=None):
-    font = ImageFont.truetype('Pixel Fonts/5x5/5×5.ttf', 10)
+    font = ImageFont.truetype('5×5.ttf', 10)
     image_width = font.getsize(text)
     image = Image.new('RGB', image_width)
     draw = ImageDraw.Draw(image)

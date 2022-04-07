@@ -2,7 +2,7 @@ from functions import text_to_rgb, blit
 import time
 import numpy as np
 from datetime import datetime
-#from WS2812_matrix import WS2812_matrix
+from WS2812_matrix import WS2812_matrix
 from PIL import Image
 from pygame_matrix import PygameDisplay
 
@@ -84,30 +84,30 @@ class ShowTime:
 
 
 if __name__ == "__main__":
-    #display = WS2812_matrix(15, 20)
-    display = PygameDisplay(15, 20)
+    display = WS2812_matrix(15, 20)
+    #display = PygameDisplay(15, 20)
 
-    # mov_text = MovingText("FH-WS", 20, 200, 1000, "Orange")
-    # out = np.zeros((15, 20, 3), dtype=np.uint8)
-    # while True:
-    #     out_text = mov_text.update()
-    #     # if mov_text.done:
-    #     #     print("Done")
-    #     if out_text is not None:
-    #         out = np.zeros((15, 20, 3), dtype=np.uint8)
-    #         blit(out, out_text, (1, 0))
-    #         # img = Image.fromarray(out, "RGB")
-    #         # img.show()
-    #         # img.save("test.png")
-    #         # input()
-    #     display.update(out)
+    #mov_text = MovingText("FH-WS", 20, 200, 1000, (255,0,255)) #(Text, Pixellaenge, Durchlauf in ms, sleep time after text, Farbe)
+#     out = np.zeros((15, 20, 3), dtype=np.uint8)
+#     while True:
+#         out_text = mov_text.update()
+#         if mov_text.done: #Wenn text durchgelaufen ist
+#             print("Done")
+#         if out_text is not None:
+#             out = np.zeros((15, 20, 3), dtype=np.uint8)
+#             blit(out, out_text, (1, 0))
+#              # img = Image.fromarray(out, "RGB")
+#              # img.show()
+#              # img.save("test.png")
+#              # input()
+#         display.update(out)
 
     show_time = ShowTime((0, 127, 255))
     out = np.zeros((15, 20, 3), dtype=np.uint8)
     while True:
         out_time = show_time.update()
         if out_time is not None:
-            out = np.zeros((15, 20, 3), dtype=np.uint8)
+            out = np.full((15, 20, 3),(255,0,0), dtype=np.uint8)
             blit(out, out_time, (2, 4))
             # img = Image.fromarray(out, "RGB")
             # img.show()
