@@ -17,12 +17,17 @@ def text_to_rgb(text, fill=None):
     return arr_image
 
 
-def blit(dest, src, loc):
+def blit(dest, src, loc, transparent=False):
     pos = [i if i >= 0 else None for i in loc]
     neg = [-i if i < 0 else None for i in loc]
     target = dest[tuple([slice(i, None) for i in pos])]
     lambda_add = lambda v: 0 if v is None else v
     end = (target.shape[0]+lambda_add(neg[0]), target.shape[1]+lambda_add(neg[1]))
     src = src[tuple([slice(i, j) for i, j in zip(neg, end)])]
-    target[tuple([slice(None, i) for i in src.shape])] = src
+    if transparent:
+        back = target[tuple([slice(None, i) for i in src.shape])]
+        out = np.array([[j if all(v == 0 for v in j) == 0 else i for i, j in zip(b, f)] for b, f in zip(back, src)])
+        target[tuple([slice(None, i) for i in src.shape])] = out
+    else:
+        target[tuple([slice(None, i) for i in src.shape])] = src
     return dest
