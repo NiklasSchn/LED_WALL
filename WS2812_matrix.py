@@ -51,7 +51,8 @@ class WS2812_matrix:
         self.pixels.show()
 
     # Writes single LED
-    def write_single(self, y_pos, x_pos, color):
+    # Color must be of type Tuple: (R, G, B)
+    def write(self, y_pos, x_pos, color):
         y_pos = self.size_y - y_pos - 1
         x_pos = self.size_x - x_pos - 1
         print(y_pos, " , ", x_pos)
@@ -85,7 +86,7 @@ if __name__ == "__main__":
             display_data[y][x] = (0, 0, 0)
         print("Update")
         # display.update(display_data)  # Updates teh data to the LEDs
-        display.write_single(0, 0, (255, 0, 0))
+        display.write(0, 0, (255, 0, 0))
         time.sleep(0.1)
 
         # Sequence for testing
