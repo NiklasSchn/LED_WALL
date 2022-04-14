@@ -22,11 +22,12 @@ class WS2812_matrix:
                                         pixel_order=neopixel.RGB)
 
     # Writes (0, 0, 0) an all LEDs
-    def clear(self):
+    def clear(self, write=False):
         for i in range(self.size_x * self.size_y):
             self.pixels[i] = (0, 0, 0)
 
-        self.pixels.show()
+        if write:
+            self.pixels.show()
 
     # 'data' is a 3 dimensional array where the first element represent the y position, the second the x position and
     # the third the RGB value (in that order)
