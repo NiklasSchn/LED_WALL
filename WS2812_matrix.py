@@ -18,7 +18,8 @@ class WS2812_matrix:
         self.range_y_inv = range(0, self.size_y)[::-1]
 
         # Initialize NeoPixel class
-        self.pixels = neopixel.NeoPixel(board.D18, self.size_x*self.size_y, auto_write=False, pixel_order=neopixel.RGB)
+        self.pixels = neopixel.NeoPixel(board.D18, self.size_x * self.size_y, auto_write=False,
+                                        pixel_order=neopixel.RGB)
 
     # Writes (0, 0, 0) an all LEDs
     def clear(self):
@@ -49,6 +50,22 @@ class WS2812_matrix:
         # Writes the values on the LEDs
         self.pixels.show()
 
+    # Writes single LED
+    def write_single(self, y_pos, x_pos, color):
+        y_pos = self.size_y - y_pos - 1
+        x_pos = self.size_x - x_pos - 1
+        print(y_pos, " , ", x_pos)
+        i = x_pos * self.size_y
+        if x_pos % 2 == 0:
+            i += self.size_y - y_pos - 1
+        else:
+            i += y_pos
+
+        print(i)
+
+        self.pixels[i] = color
+        self.pixels.show()
+
 
 if __name__ == "__main__":
     # Dimensions of the display
@@ -67,7 +84,8 @@ if __name__ == "__main__":
         else:
             display_data[y][x] = (0, 0, 0)
         print("Update")
-        display.update(display_data)  # Updates teh data to the LEDs
+        # display.update(display_data)  # Updates teh data to the LEDs
+        display.write_single(0, 0, (255, 0, 0))
         time.sleep(0.1)
 
         # Sequence for testing
