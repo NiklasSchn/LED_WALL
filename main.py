@@ -1,7 +1,7 @@
 import time
 import requests
 from PIL import Image
-BASE_URL = "https://api.openweathermap.org/data/2.5/weather?lat=50.04937&lon=10.22175&appid=c9d90dffca3619df2802e8c042def487&units=metric"
+BASE_URL = "https://api.openweathermap.org/data/2.5/weather?lat=50.04937&lon=10.22175&appid={}&units=metric"
 #Schweinfurt lat=50.04937&lon=10.22175
 
 final_url = BASE_URL
