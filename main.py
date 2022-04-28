@@ -9,7 +9,8 @@ import numpy as np
 import time
 
 app = Flask(__name__)
-run_flag = False                        
+run_flag = False
+
 @app.route("/")
 def home():
     return render_template("index.html")
