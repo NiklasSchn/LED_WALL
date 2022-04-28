@@ -34,6 +34,26 @@ class WS2812_matrix:
                     i += 1
 
         self.pixels.show()
+    
+    def clear(self):
+        for i in range(self.size_x * self.size_y):
+            self.pixels[i] = (0, 0, 0)
+
+        #self.pixels.show()
+        
+    def write(self, x_pos, y_pos, color):
+        y_pos = self.size_y - y_pos - 1
+        x_pos = self.size_x - x_pos - 1
+        print(y_pos, " , ", x_pos)
+        i = x_pos * self.size_y
+        if x_pos % 2 == 0:
+            i += self.size_y - y_pos - 1
+        else:
+            i += y_pos
+
+        self.pixels[i] = color
+        self.pixels.show()
+        
 
 
 if __name__ == "__main__":
