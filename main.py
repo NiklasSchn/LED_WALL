@@ -71,7 +71,7 @@ def home():
     return render_template("index.html")
 display = WS2812_matrix(15, 20)
 
-@app.route("/on")
+@app.route("/Capture")
 def Capture():
     global run_flag
     run_flag = True
