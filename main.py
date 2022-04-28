@@ -11,6 +11,7 @@ import mediapipe as mp
 import cv2
 import time
 from PIL import Image
+import requests
 
 WIDTH = 640
 HEIGHT = 480
@@ -22,6 +23,7 @@ cap = 0
 CaptureFlag = False
 CameraRenderFlag = False
 TempFlag = False
+ShowImageFlag = False
 
 def cleanUp():
     global CaptureFlag
@@ -32,6 +34,9 @@ def cleanUp():
     
     global TempFlag
     TempFlag = False
+    
+    global ShowImageFlag
+    ShowImageFlag = False
     global cap
     if cap != 0:
         cap.release()
@@ -219,17 +224,26 @@ def ShowTemp():
     global TempFlag
     TempFlag = True
     
+    BASE_URL = "https://api.openweathermap.org/data/2.5/weather?lat=50.04937&lon=10.22175&appid={}&units=metric"
+    #Schweinfurt lat=50.04937&lon=10.22175
     
-    temperature = 20.0
-    show_temp = MovingText(str(round(temperature, 1)) + "°C", 20, 150, 500, (255, 0, 255))  # (Text, Pixellaenge, Durchlauf in ms, sleep time after text, Farbe)
+    final_url = BASE_URL
+    weather_data = requests.get(final_url).json()
+    print(weather_data)
+#     icon = weather_data.get("weather")[0].get("icon")
+#     conChopped = str(icon)[0] + str(icon)[1]
+#     urlicon = f"http://openweathermap.org/img/wn/{icon}@2x.png"
+#      
+#     img = Image.open(f"weather_icons/{iconChopped}.png") 
+#     img.show()
+    
+    currentTemp = str(weather_data.get("main").get("temp"))
+    temperature = currentTemp
+    show_temp = MovingText(temperature + "°C", 20, 150, 500, (255, 0, 255))  # (Text, Pixellaenge, Durchlauf in ms, sleep time after text, Farbe)
     out = np.zeros((15, 20, 3), dtype=np.uint8)
     while TempFlag:
-         if show_temp.done:
-             if temperature < 25.0:
-                 temperature += 0.3
-             else:
-                 temperature = 19
-             show_temp.update_text(str(round(temperature, 1)) + "°C")
+        
+         show_temp.update_text(temperature + "°C")
          out_text = show_temp.update()
          if out_text is not None:
              out = np.zeros((15, 20, 3), dtype=np.uint8)
@@ -267,13 +281,14 @@ def RenderCameraCapture():
 
 @app.route("/Gamemode2")
 def ShowImage():
-    global run_flag
-    run_flag = True
+    cleanUp()
+    global ShowImageFlag
+    ShowImageFlag = True
     out = np.zeros((15, 20, 3), dtype=np.uint8)
-    while run_flag:
-        image = Image.open("color_icon.png") #Hier noch das Bild wechseln !!
+    while ShowImageFlag:
+        image = Image.open("weather_icons/02.png") #Hier noch das Bild wechseln !!
         image.thumbnail((20, 15))
-        background = Image.new("RGB", image.size, (255, 255, 255))
+        background = Image.new("RGB", image.size, (0, 0, 0))
         background.paste(image, mask=image.split()[3])  # 3 is the alpha channel
         blit(out, np.array(background, dtype=np.uint8), (0, 0))
         display.update(out)
