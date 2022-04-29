@@ -5,6 +5,14 @@ Niklas Schneider <SchneiderNiklas97@web.de>
 :icons: font
 :hide-uri-scheme:
 
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
 In this project, an LED-Wall is to be controlled with the help of a Raspberry Pi and a camera. The whole thing runs on a Flask web server.
 
 == Requirements
