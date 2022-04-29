@@ -1,0 +1,33 @@
+= LED WALL Project
+Niklas Schneider <SchneiderNiklas97@web.de>
+1.0, 26.11.2022: HTML
+:toc: auto
+:icons: font
+:hide-uri-scheme:
+
+In this project, an LED-Wall is to be controlled with the help of a Raspberry Pi and a camera. The whole thing runs on a Flask web server.
+
+== Requirements
+
+* Python: Version [3.8]
+* Flask: Version [newest]
+* board: Version [newest]
+* neopixel: Version [newest]
+* numpy: Version[ newest]
+* mediapipe: Version [newest]
+* cv2: Version[newest]
+* Pillow: Version[newest]
+* requests: Version[newest]
+
+== Features
+
+The project is still in progress. Until now you have following Features which are working most of the time:
+
+* Flask Webserver which can controll the Wall
+* Swiping gesture to switch modes
+* CameraRenderMode which puts the live image on the wall
+* PictureRenderMode that let you render a picture on the wall
+
+* Get current time and temperature
+
+IMPORTANT: To get the current temperature you have to create a account on https://openweathermap.org and at your API key and the koordinates of your location to the BASE_URL
