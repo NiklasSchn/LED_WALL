@@ -1,5 +1,4 @@
 from flask import Flask, render_template, redirect, url_for, request
-import os
 from functions import text_to_rgb, blit
 from text_classes import ShowTime
 from WS2812_matrix import WS2812_matrix
@@ -9,7 +8,6 @@ import neopixel
 import numpy as np
 import mediapipe as mp
 import cv2
-import time
 from PIL import Image
 import requests
 
