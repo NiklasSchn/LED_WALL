@@ -16,7 +16,7 @@ class WS2812_matrix:
         self.range_y = range(0, self.size_y)
         self.range_y_inv = range(0, self.size_y)[::-1]
         ORDER = neopixel.RGB
-        self.pixels = neopixel.NeoPixel(board.D18, self.size_x*self.size_y, auto_write=False, pixel_order=ORDER)
+        self.pixels = neopixel.NeoPixel(board.D18, self.size_x*self.size_y, auto_write=False, brightness = 0.2, pixel_order=ORDER)
 
     # 'data' is a 3 dimensional array where the first element represent the y position, the second the x position and
     # the third the RGB value (in that order)
