@@ -96,7 +96,7 @@ def switchPage(widget):
         while CaptureFlag:
         
             # Enter your API Key here (xxx)
-            BASE_URL = "https://api.openweathermap.org/data/2.5/weather?lat=50.04937&lon=10.22175&appid=fb2a644416a8cca50976e61f38ad0b44&units=metric"
+            BASE_URL = "https://api.openweathermap.org/data/2.5/weather?lat=50.04937&lon=10.22175&appid=xxxxxxxxx&units=metric"
             # Schweinfurt lat=50.04937&lon=10.22175
 
             final_url = BASE_URL
@@ -137,7 +137,7 @@ def switchPage(widget):
    
         out = np.zeros((15, 20, 3), dtype=np.uint8)
         while CaptureFlag:
-            image = Image.open("weather_icons/02.png")
+            image = Image.open("Mario.png")
             image.thumbnail((20, 15))
             background = Image.new("RGB", image.size, (0, 0, 0))
             background.paste(image, mask=image.split()[3])  # 3 is the alpha channel
@@ -193,6 +193,8 @@ def Capture():
         cap = cv2.VideoCapture(0)
         cap.set(3, 640)
         cap.set(4, 480)
+        outSwipeStatus = np.zeros((15,20,3), dtype= np.uint8)
+        
         with mp_hands.Hands(
                 max_num_hands=1,
                 min_detection_confidence=0.5,
@@ -214,7 +216,8 @@ def Capture():
                 image.flags.writeable = True
                 image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
                 if cnt == 30:
-                    display.write(20, 0, (0, 255, 0))
+                    outSwipeStatus[0][0] = (0,255,0)
+                    
                     print("Swipe möglich")
                 try:
                     if results.multi_hand_landmarks:
@@ -225,7 +228,7 @@ def Capture():
 
                     SwipeResult = SwipeReco(cx)
                     if (SwipeResult > 60) & (cnt > 20):
-                        display.write(20,0,(255,0,0))
+                        outSwipeStatus[0][0] = (255,0,0)
                         global swipe_cnt
                         
                         ### Swipe to right detected ###
@@ -239,7 +242,7 @@ def Capture():
                         cnt = 0
 
                     elif (SwipeResult < -60) & (cnt > 20):
-                        display.write(20, 0, (255, 0, 0))
+                        outSwipeStatus[0][0] = (255,0,0)
 
                         if(swipe_cnt != 0):
                             swipe_cnt = swipe_cnt - 1
@@ -255,23 +258,27 @@ def Capture():
                     detected = False
                     
                 out = np.zeros((15, 20, 3), dtype=np.uint8)
+                
                 if(swipe_cnt ==1):
                     mode = text_to_rgb("Time",(255,255,255))
                     blit(out, mode,(0,0),True)
-                    display.update(out)
+                    
                     
                 elif(swipe_cnt ==2):
                     mode = text_to_rgb("Temp",(255,255,0))
                     blit(out, mode,(0,0),True)
-                    display.update(out)
+                    
                     
                 elif(swipe_cnt ==0):
                     mode = text_to_rgb("Img",(0,255,255))
                     blit(out, mode,(0,0),True)
-                    display.update(out)
+                    
+                blit(out,outSwipeStatus,(0,0),True)
+                display.update(out)
                 if((cnt == 100) & detected):
                     print("lock", " " , swipe_cnt)
                     switchPage(swipe_cnt)
+                
                 cv2.imshow('MediaPipe Hands', image)
                 if cv2.waitKey(5) & 0xFF == ord('q'):
                     break
