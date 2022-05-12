@@ -10,6 +10,7 @@ import mediapipe as mp
 import cv2
 from PIL import Image
 import requests
+import time
 
 
 ## Camera Width x Height ##
@@ -20,7 +21,7 @@ HEIGHT = 480
 Xinit = 0
 widget = 0
 cap = 0
-time = 0
+
 swipe_cnt = 0
 ## Initial Flags to set different Modes ##
 CaptureFlag = False
@@ -86,24 +87,49 @@ def switchPage(widget):
             display.update(out)
 
     elif widget == 2:  #Current Temperature widget
-        temperature = 20.0
-        show_temp = MovingText(str(round(temperature, 1)) + "°C", 20, 150, 500, (255, 0, 255))  # (Text, Pixellaenge, Durchlauf in ms, sleep time after text, Farbe)
-        out = np.zeros((15, 20, 3), dtype=np.uint8)
-        while (CaptureFlag):
+        cleanUp()
+        
+        CaptureFlag = True
+
+        show_temp = MovingText( "°C", 20, 150, 500, (255, 0, 255))  # (Text, Pixellaenge, Durchlauf in ms, sleep time after text, Farbe)
+
+        while CaptureFlag:
+        
+            # Enter your API Key here (xxx)
+            BASE_URL = "https://api.openweathermap.org/data/2.5/weather?lat=50.04937&lon=10.22175&appid=fb2a644416a8cca50976e61f38ad0b44&units=metric"
+            # Schweinfurt lat=50.04937&lon=10.22175
+
+            final_url = BASE_URL
+            weather_data = requests.get(final_url).json()
+
+            icon = weather_data.get("weather")[0].get("icon")
+            iconChopped = str(icon)[0] + str(icon)[1]
+            image = Image.open(f"weather_icons/{iconChopped}.png")
+            image.thumbnail((35, 25))
+            background = Image.new("RGB", image.size, (0, 0, 0))
+            background.paste(image, mask=image.split()[3])  # 3 is the alpha channel
+            currentTemp = str(weather_data.get("main").get("temp"))
+            out = np.zeros((15, 20, 3), dtype=np.uint8)
+
+            if show_temp.done:
+                blit(out, np.array(background, dtype=np.uint8), (-6, -3))
+                display.update(out)
+                time.sleep(8)
+                show_temp.restart()
+            else:
+                show_temp.update_text(currentTemp + "°C")
+                out_text = show_temp.update()
+                if out_text is not None:
+                    out = np.zeros((15, 20, 3), dtype=np.uint8)
+                    blit(out, out_text, (1, 0), transparent=True)
+                display.update(out)
+            
+           
+           
             
            
             
-            if show_temp.done:
-                 if temperature < 25.0:
-                     temperature += 0.3
-                 else:
-                     temperature = 19
-                 show_temp.update_text(str(round(temperature, 1)) + "°C")
-            out_text = show_temp.update()
-            if out_text is not None:
-                 out = np.zeros((15, 20, 3), dtype=np.uint8)
-                 blit(out, out_text, (1, 0), transparent=True)
-            display.update(out)
+           
         
     elif widget == 0:
         
@@ -281,8 +307,9 @@ def ShowTemp():
     show_temp = MovingText( "°C", 20, 150, 500, (255, 0, 255))  # (Text, Pixellaenge, Durchlauf in ms, sleep time after text, Farbe)
 
     while TempFlag:
+        
         # Enter your API Key here (xxx)
-        BASE_URL = "https://api.openweathermap.org/data/2.5/weather?lat=50.04937&lon=10.22175&appid=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&units=metric"
+        BASE_URL = "https://api.openweathermap.org/data/2.5/weather?lat=50.04937&lon=10.22175&appid=fb2a644416a8cca50976e61f38ad0b44&units=metric"
         # Schweinfurt lat=50.04937&lon=10.22175
 
         final_url = BASE_URL
@@ -291,15 +318,17 @@ def ShowTemp():
         icon = weather_data.get("weather")[0].get("icon")
         iconChopped = str(icon)[0] + str(icon)[1]
         image = Image.open(f"weather_icons/{iconChopped}.png")
-        image.thumbnail((20, 15))
+        image.thumbnail((35, 25))
         background = Image.new("RGB", image.size, (0, 0, 0))
         background.paste(image, mask=image.split()[3])  # 3 is the alpha channel
         currentTemp = str(weather_data.get("main").get("temp"))
         out = np.zeros((15, 20, 3), dtype=np.uint8)
 
         if show_temp.done:
-            blit(out, np.array(background, dtype=np.uint8), (0, 0))
+            blit(out, np.array(background, dtype=np.uint8), (-6, -3))
             display.update(out)
+            time.sleep(8)
+            show_temp.restart()
         else:
             show_temp.update_text(currentTemp + "°C")
             out_text = show_temp.update()
