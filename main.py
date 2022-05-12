@@ -277,30 +277,37 @@ def ShowTemp():
     cleanUp()
     global TempFlag
     TempFlag = True
-    #Enter your API Key here (xxx)
-    BASE_URL = "https://api.openweathermap.org/data/2.5/weather?lat=50.04937&lon=10.22175&appid=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&units=metric"
-    #Schweinfurt lat=50.04937&lon=10.22175
-    
-    final_url = BASE_URL
-    weather_data = requests.get(final_url).json()
-    print(weather_data)
-#     icon = weather_data.get("weather")[0].get("icon")
-#     conChopped = str(icon)[0] + str(icon)[1]
-#     urlicon = f"http://openweathermap.org/img/wn/{icon}@2x.png"
-#     img = Image.open(f"weather_icons/{iconChopped}.png") 
-#     img.show()
-    
-    currentTemp = str(weather_data.get("main").get("temp"))
-    temperature = currentTemp
-    show_temp = MovingText(temperature + "°C", 20, 150, 500, (255, 0, 255))  # (Text, Pixellaenge, Durchlauf in ms, sleep time after text, Farbe)
-    out = np.zeros((15, 20, 3), dtype=np.uint8)
+
+    show_temp = MovingText( "°C", 20, 150, 500, (255, 0, 255))  # (Text, Pixellaenge, Durchlauf in ms, sleep time after text, Farbe)
+
     while TempFlag:
-         show_temp.update_text(temperature + "°C")
-         out_text = show_temp.update()
-         if out_text is not None:
-             out = np.zeros((15, 20, 3), dtype=np.uint8)
-             blit(out, out_text, (1, 0), transparent=True)
-         display.update(out)
+        # Enter your API Key here (xxx)
+        BASE_URL = "https://api.openweathermap.org/data/2.5/weather?lat=50.04937&lon=10.22175&appid=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&units=metric"
+        # Schweinfurt lat=50.04937&lon=10.22175
+
+        final_url = BASE_URL
+        weather_data = requests.get(final_url).json()
+
+        icon = weather_data.get("weather")[0].get("icon")
+        iconChopped = str(icon)[0] + str(icon)[1]
+        image = Image.open(f"weather_icons/{iconChopped}.png")
+        image.thumbnail((20, 15))
+        background = Image.new("RGB", image.size, (0, 0, 0))
+        background.paste(image, mask=image.split()[3])  # 3 is the alpha channel
+        currentTemp = str(weather_data.get("main").get("temp"))
+        out = np.zeros((15, 20, 3), dtype=np.uint8)
+
+        if show_temp.done:
+            blit(out, np.array(background, dtype=np.uint8), (0, 0))
+            display.update(out)
+        else:
+            show_temp.update_text(currentTemp + "°C")
+            out_text = show_temp.update()
+            if out_text is not None:
+                out = np.zeros((15, 20, 3), dtype=np.uint8)
+                blit(out, out_text, (1, 0), transparent=True)
+            display.update(out)
+
 
     return render_template("index.html")
 
