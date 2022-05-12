@@ -181,6 +181,7 @@ def Capture():
     CaptureFlag = True
     
     while CaptureFlag:
+
         global WIDTH
         global HEIGHT
         mp_drawing = mp.solutions.drawing_utils
@@ -213,6 +214,7 @@ def Capture():
                 image.flags.writeable = True
                 image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
                 if cnt == 30:
+                    display.write(20, 0, (0, 255, 0))
                     print("Swipe möglich")
                 try:
                     if results.multi_hand_landmarks:
@@ -223,10 +225,11 @@ def Capture():
 
                     SwipeResult = SwipeReco(cx)
                     if (SwipeResult > 60) & (cnt > 20):
+                        display.write(20,0,(255,0,0))
                         global swipe_cnt
                         
                         ### Swipe to right detected ###
-                        #widget = 1
+
                         if(swipe_cnt != 2):
                             swipe_cnt = swipe_cnt + 1
                         else:
@@ -236,14 +239,15 @@ def Capture():
                         cnt = 0
 
                     elif (SwipeResult < -60) & (cnt > 20):
-                        #global time
+                        display.write(20, 0, (255, 0, 0))
+
                         if(swipe_cnt != 0):
                             swipe_cnt = swipe_cnt - 1
                         else:
                             swipe_cnt = 2
                             
                         ### Swipe to left detected ###
-                        #widget = -1
+
                         print("Links")
                         cnt = 0
                     detected = True
