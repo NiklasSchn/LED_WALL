@@ -38,4 +38,4 @@ The project is still in progress. Until now you have following Features which ar
 
 * Get current time and temperature
 
-IMPORTANT: To get the current temperature you have to create a account on https://openweathermap.org and at your API key and the koordinates of your location to the BASE_URL
+IMPORTANT: To get the current temperature you have to create a account on https://openweathermap.org and add your API key and the koordinates of your location to the BASE_URL
