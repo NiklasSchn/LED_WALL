@@ -11,7 +11,7 @@ import cv2
 from PIL import Image
 import requests
 import time
-
+from picamera import PiCamera
 
 ## Camera Width x Height ##
 WIDTH = 640
@@ -96,19 +96,19 @@ def switchPage(widget):
         while CaptureFlag:
         
             # Enter your API Key here (xxx)
-            BASE_URL = "https://api.openweathermap.org/data/2.5/weather?lat=50.04937&lon=10.22175&appid=xxxxxxxxx&units=metric"
+            #BASE_URL = "https://api.openweathermap.org/data/2.5/weather?lat=50.04937&lon=10.22175&appid=xxxxxxxxx&units=metric"
             # Schweinfurt lat=50.04937&lon=10.22175
 
-            final_url = BASE_URL
-            weather_data = requests.get(final_url).json()
+            #final_url = BASE_URL
+            #weather_data = requests.get(final_url).json()
 
-            icon = weather_data.get("weather")[0].get("icon")
-            iconChopped = str(icon)[0] + str(icon)[1]
-            image = Image.open(f"weather_icons/{iconChopped}.png")
+            #icon = weather_data.get("weather")[0].get("icon")
+            #iconChopped = str(icon)[0] + str(icon)[1]
+            image = Image.open(f"weather_icons/01.png") #Hier Icon setzen
             image.thumbnail((35, 25))
             background = Image.new("RGB", image.size, (0, 0, 0))
-            background.paste(image, mask=image.split()[3])  # 3 is the alpha channel
-            currentTemp = str(weather_data.get("main").get("temp"))
+            background.paste(image, mask=image.split()[3])  # 3 is the alpha channel 
+            #currentTemp = str(weather_data.get("main").get("temp"))
             out = np.zeros((15, 20, 3), dtype=np.uint8)
 
             if show_temp.done:
@@ -117,21 +117,14 @@ def switchPage(widget):
                 time.sleep(8)
                 show_temp.restart()
             else:
-                show_temp.update_text(currentTemp + "°C")
+                show_temp.update_text("22" + "°C") #Hartcodiert
                 out_text = show_temp.update()
                 if out_text is not None:
                     out = np.zeros((15, 20, 3), dtype=np.uint8)
                     blit(out, out_text, (1, 0), transparent=True)
-                display.update(out)
-            
-           
-           
-            
-           
-            
-           
-        
-    elif widget == 0:
+                    display.update(out)
+              
+    elif widget == 0: #ImgRender
         
    
    
@@ -202,7 +195,7 @@ def Capture():
             while cap.isOpened():
                 cnt = cnt + 1
                 success, image = cap.read()
-                image = cv2.flip(image, 1)
+                image = cv2.flip(image, 0)
                 if not success:
                     print("Ignoring empty camera frame.")
                     # If loading a video, use 'break' instead of 'continue'.
@@ -227,7 +220,7 @@ def Capture():
                             cx, cy = int(lmx * WIDTH), int(lmy * HEIGHT)
 
                     SwipeResult = SwipeReco(cx)
-                    if (SwipeResult > 60) & (cnt > 20):
+                    if (SwipeResult > 90) & (cnt > 20):
                         outSwipeStatus[0][0] = (255,0,0)
                         global swipe_cnt
                         
@@ -241,7 +234,7 @@ def Capture():
                         print("Rechts")
                         cnt = 0
 
-                    elif (SwipeResult < -60) & (cnt > 20):
+                    elif (SwipeResult < -90) & (cnt > 20):
                         outSwipeStatus[0][0] = (255,0,0)
 
                         if(swipe_cnt != 0):
@@ -279,7 +272,7 @@ def Capture():
                     print("lock", " " , swipe_cnt)
                     switchPage(swipe_cnt)
                 
-                cv2.imshow('MediaPipe Hands', image)
+                cv2.imshow('MediaPipe Hands', cv2.flip(image,0))
                 if cv2.waitKey(5) & 0xFF == ord('q'):
                     break
 
@@ -291,6 +284,7 @@ def Capture():
 ### Shutdown Endpoint to stop all Leds ###
 @app.route("/Shutdown")
 def Shutdown():
+    
     global CaptureFlag
     CaptureFlag = False
     
@@ -299,56 +293,20 @@ def Shutdown():
     
     global TempFlag
     TempFlag = False
+    
+    global ShowImageFlag
+    ShowImageFlag = False
+    
+    global LightModeFlag
+    LightModeFlag = False
 
     global cap
-    cap.release()
-    cv2.destroyAllWindows()
-    print("Shutdown")
+    if cap:
+        cap.release()
+        cv2.destroyAllWindows()
+   
     out = np.zeros((15, 20, 3), dtype=np.uint8)
     display.update(out)
-    return render_template("index.html")
-
-### Show current Temp and Icon ###
-@app.route("/Weather")
-def ShowTemp():
-    cleanUp()
-    global TempFlag
-    TempFlag = True
-
-    show_temp = MovingText( "°C", 20, 150, 500, (255, 0, 255))  # (Text, Pixellaenge, Durchlauf in ms, sleep time after text, Farbe)
-
-    while TempFlag:
-        
-        # Enter your API Key here (xxx)
-        BASE_URL = "https://api.openweathermap.org/data/2.5/weather?lat=50.04937&lon=10.22175&appid=fb2a644416a8cca50976e61f38ad0b44&units=metric"
-        # Schweinfurt lat=50.04937&lon=10.22175
-
-        final_url = BASE_URL
-        weather_data = requests.get(final_url).json()
-
-        icon = weather_data.get("weather")[0].get("icon")
-        iconChopped = str(icon)[0] + str(icon)[1]
-        image = Image.open(f"weather_icons/{iconChopped}.png")
-        image.thumbnail((35, 25))
-        background = Image.new("RGB", image.size, (0, 0, 0))
-        background.paste(image, mask=image.split()[3])  # 3 is the alpha channel
-        currentTemp = str(weather_data.get("main").get("temp"))
-        out = np.zeros((15, 20, 3), dtype=np.uint8)
-
-        if show_temp.done:
-            blit(out, np.array(background, dtype=np.uint8), (-6, -3))
-            display.update(out)
-            time.sleep(8)
-            show_temp.restart()
-        else:
-            show_temp.update_text(currentTemp + "°C")
-            out_text = show_temp.update()
-            if out_text is not None:
-                out = np.zeros((15, 20, 3), dtype=np.uint8)
-                blit(out, out_text, (1, 0), transparent=True)
-            display.update(out)
-
-
     return render_template("index.html")
 
 ### Camera LiveRenderMode ###
@@ -366,9 +324,10 @@ def RenderCameraCapture():
      while CameraRenderFlag:
          global cap
          cap = cv2.VideoCapture(0)
+        
          while cap.isOpened():
              success, image = cap.read()
-             image = cv2.flip(image, 1)
+             image = cv2.flip(image, 0)
              image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
              image = Image.fromarray(image)
              image.thumbnail((20, 15))
@@ -406,7 +365,7 @@ def LightMode():
         mp_drawing = mp.solutions.drawing_utils
         mp_drawing_styles = mp.solutions.drawing_styles
         mp_hands = mp.solutions.hands
-        
+        outSwipeStatus = np.zeros((15,20,3), dtype= np.uint8)
         cnt = 0
         global cap
         cap = cv2.VideoCapture(0)
@@ -419,7 +378,7 @@ def LightMode():
             while cap.isOpened():
                 cnt = cnt + 1
                 success, image = cap.read()
-                image = cv2.flip(image, 1)
+                image = cv2.flip(image, 0)
                 if not success:
                     print("Ignoring empty camera frame.")
                     # If loading a video, use 'break' instead of 'continue'.
@@ -434,6 +393,7 @@ def LightMode():
                 image.flags.writeable = True
                 image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
                 if cnt == 30:
+                    outSwipeStatus[0][0] = (0,255,0)
                     print("Swipe möglich")
                 try:
                     
@@ -454,7 +414,7 @@ def LightMode():
                             swipe_cnt = swipe_cnt + 1
                         else:
                             swipe_cnt = 0
-                            
+                        outSwipeStatus[0][0] = (255,0,0)    
                         print("Rechts")
                         cnt = 0
 
@@ -466,7 +426,7 @@ def LightMode():
                             swipe_cnt = 2
                             
                         ### Swipe to left detected ###
-                       
+                        outSwipeStatus[0][0] = (255,0,0)
                         print("Links")
                         cnt = 0
                     detected = True
@@ -477,21 +437,34 @@ def LightMode():
                 out = np.zeros((15, 20, 3), dtype=np.uint8)
                 if(swipe_cnt ==1):
                     out = np.full((15,20,3),(255,255,255),dtype=np.uint8)
-                    display.update(out)
+                        
                     
                 elif(swipe_cnt ==2):
                     
                     out = np.full((15,20,3),(0,255,255),dtype=np.uint8)
-                    display.update(out)
+                    
                     
                 elif(swipe_cnt ==0):
                     out = np.full((15,20,3),(0,0,0),dtype=np.uint8)
-                    display.update(out)
                     
+                blit(out,outSwipeStatus,(0,0),True)
+                display.update(out)     
                 if((cnt == 100) & detected):
-                    while LightModeFlag:
-                        print("lock")
+                    if(swipe_cnt ==1):
+                        out = np.full((15,20,3),(255,255,255),dtype=np.uint8)
                         
+                    
+                    elif(swipe_cnt ==2):
+                    
+                        out = np.full((15,20,3),(0,255,255),dtype=np.uint8)
+                    
+                    
+                    elif(swipe_cnt ==0):
+                        out = np.full((15,20,3),(0,0,0),dtype=np.uint8)
+                    display.update(out)  
+                    while LightModeFlag:
+                        pass
+                      
                 cv2.imshow('MediaPipe Hands', image)
                 if cv2.waitKey(5) & 0xFF == ord('q'):
                     break
