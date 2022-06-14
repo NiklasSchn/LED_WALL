@@ -1,6 +1,7 @@
 from functions import text_to_rgb, blit
 import time
 import numpy as np
+from numpy import random
 from datetime import datetime
 #from WS2812_matrix import WS2812_matrix
 from PIL import Image
@@ -120,6 +121,44 @@ class StartGame:
 
         return self.out
 
+class FireEffect:
+    def __init__(self, color):
+        self.last_time = time.time()
+        if color == "orange":
+            self.fire_colors = [(250, 192, 0), (255, 117, 0), (252, 100, 0), (215, 53, 2), (182, 34, 3), (128, 17, 0), (0, 0, 0)]
+        elif color == "blue":
+            self.fire_colors = [(48, 154, 241), (102, 190, 249), (183, 232, 235), (156, 222, 235), (17, 101, 193), (4, 63, 152), (0, 0, 0)]
+        elif color == "violette":
+            self.fire_colors = [(97, 189, 172), (94, 138, 181), (86, 82, 171), (45, 39, 102), (13, 9, 40), (0, 0, 0)]
+        if len(self.fire_colors) == 7:
+            self.random_max_value = 3
+        else:
+            self.random_max_value = 2
+        self.mask = np.full((16, 20), len(self.fire_colors)-1, dtype=np.uint8)
+        self.mask[15] = 0
+        self.out = np.zeros((15, 20, 3), dtype=np.uint8)
+
+    def restart(self):
+        pass
+
+    def update(self):
+        if time.time() - self.last_time > 0.2:
+            self.last_time = time.time()
+            for x in range(20):
+                 for y in range(15):
+                     random_value = self.mask[y+1][x] + random.randint(0, self.random_max_value)
+                     if random_value > len(self.fire_colors)-1:
+                         random_value = len(self.fire_colors)-1
+                     self.mask[y][x] = random_value
+
+
+            for y in range(15):
+                for x in range(20):
+                    self.out[y][x] = self.fire_colors[self.mask[y][x]]
+
+        return self.out
+
+
 
 if __name__ == "__main__":
     # display = WS2812_matrix(15, 20)
@@ -206,13 +245,20 @@ if __name__ == "__main__":
 
     # Show image
 
-    out = np.zeros((15, 20, 3), dtype=np.uint8)
+    # out = np.zeros((15, 20, 3), dtype=np.uint8)
+    # while True:
+    #     image = Image.open("color_icon.png")
+    #     image.thumbnail((20, 15))
+    #     background = Image.new("RGB", image.size, (255, 255, 255))
+    #     background.paste(image, mask=image.split()[3])  # 3 is the alpha channel
+    #     blit(out, np.array(background, dtype=np.uint8), (0, 0))
+    #     display.update(out)
+
+    # Fire effect
+
+    fire = FireEffect("orange")
     while True:
-        image = Image.open("color_icon.png")
-        image.thumbnail((20, 15))
-        background = Image.new("RGB", image.size, (255, 255, 255))
-        background.paste(image, mask=image.split()[3])  # 3 is the alpha channel
-        blit(out, np.array(background, dtype=np.uint8), (0, 0))
-        display.update(out)
+        display.update(fire.update())
+
 
 

@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect, url_for, request
 from functions import text_to_rgb, blit
 from text_classes import ShowTime
 from WS2812_matrix import WS2812_matrix
-from text_classes import MovingText, ShowTime, StartGame
+from text_classes import MovingText, ShowTime, StartGame, FireEffect
 import board
 import neopixel
 import numpy as np
@@ -73,7 +73,7 @@ def switchPage(widget):
         
         ### Code to display current Mode on LEDWALL ###
            
-        show_time = ShowTime((0, 127, 255))
+        show_time = ShowTime((255, 255, 255))
         out = np.zeros((15, 20, 3), dtype=np.uint8)
         
         while (CaptureFlag):  # a mueste eine Timer Var sein
@@ -81,7 +81,7 @@ def switchPage(widget):
            
             out_time = show_time.update()
             if out_time is not None:
-                out = np.full((15, 20, 3), (255, 0, 0), dtype=np.uint8)
+                out = np.full((15, 20, 3), (51, 102, 255), dtype=np.uint8)
                 blit(out, out_time, (2, 4),True)
 
             display.update(out)
@@ -131,10 +131,10 @@ def switchPage(widget):
         out = np.zeros((15, 20, 3), dtype=np.uint8)
         while CaptureFlag:
             image = Image.open("Mario.png")
-            image.thumbnail((20, 15))
+            image.thumbnail((25, 20))
             background = Image.new("RGB", image.size, (0, 0, 0))
             background.paste(image, mask=image.split()[3])  # 3 is the alpha channel
-            blit(out, np.array(background, dtype=np.uint8), (0, 0))
+            blit(out, np.array(background, dtype=np.uint8), (-2, 2))
             display.update(out)
             
 
@@ -268,7 +268,7 @@ def Capture():
                     
                 blit(out,outSwipeStatus,(0,0),True)
                 display.update(out)
-                if((cnt == 100) & detected):
+                if((cnt == 70) & detected):
                     print("lock", " " , swipe_cnt)
                     switchPage(swipe_cnt)
                 
@@ -336,21 +336,7 @@ def RenderCameraCapture():
 
      return render_template("index.html")
 
-### RenderImage on Wall ###
-@app.route("/RenderImage")
-def ShowImage():
-    cleanUp()
-    global ShowImageFlag
-    ShowImageFlag = True
-    out = np.zeros((15, 20, 3), dtype=np.uint8)
-    while ShowImageFlag:
-        image = Image.open("weather_icons/02.png")
-        image.thumbnail((20, 15))
-        background = Image.new("RGB", image.size, (0, 0, 0))
-        background.paste(image, mask=image.split()[3])  # 3 is the alpha channel
-        blit(out, np.array(background, dtype=np.uint8), (0, 0))
-        display.update(out)
-    return render_template("index.html")
+
 
 @app.route("/LightMode")
 def LightMode():
@@ -371,6 +357,7 @@ def LightMode():
         cap = cv2.VideoCapture(0)
         cap.set(3, 640)
         cap.set(4, 480)
+        fire = FireEffect("orange")
         with mp_hands.Hands(
                 max_num_hands=1,
                 min_detection_confidence=0.5,
@@ -445,11 +432,14 @@ def LightMode():
                     
                     
                 elif(swipe_cnt ==0):
-                    out = np.full((15,20,3),(0,0,0),dtype=np.uint8)
+                    #out = np.full((15,20,3),(0,0,0),dtype=np.uint8)
+                    
+    
+                    out = fire.update()
                     
                 blit(out,outSwipeStatus,(0,0),True)
                 display.update(out)     
-                if((cnt == 100) & detected):
+                if((cnt == 70) & detected):
                     if(swipe_cnt ==1):
                         out = np.full((15,20,3),(255,255,255),dtype=np.uint8)
                         
@@ -459,11 +449,12 @@ def LightMode():
                         out = np.full((15,20,3),(0,255,255),dtype=np.uint8)
                     
                     
-                    elif(swipe_cnt ==0):
-                        out = np.full((15,20,3),(0,0,0),dtype=np.uint8)
-                    display.update(out)  
+                    
+                     
                     while LightModeFlag:
-                        pass
+                        if(swipe_cnt ==0):
+                           out = fire.update()
+                        display.update(out) 
                       
                 cv2.imshow('MediaPipe Hands', image)
                 if cv2.waitKey(5) & 0xFF == ord('q'):
